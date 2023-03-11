@@ -3,6 +3,7 @@
 #include <vector>
 #include <chrono>
 #include <omp.h>
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -20,6 +21,7 @@ double G = 6.67e-11; //gravity
 
 #define DT 0.01
 #define SIZE 9e7
+#define NUMITER 5
 
 
 //Generate random double
@@ -97,30 +99,41 @@ int main(int argc, char** argv)
     int numSteps = atoi(argv[2]);
     int nThreads = atoi(argv[3]);
 
-    cout << "gnumBodies: " << gnumBodies << endl;
-    cout << "numSteps: " << numSteps << endl;
+    cout << "number of bodies: " << gnumBodies << endl;
+    cout << "number of timesteps: " << numSteps << endl;
+    cout << "number of threads: " << nThreads << endl; 
 
     omp_set_num_threads(nThreads);
+    vector<float> med(NUMITER); 
+    for (int j = 0; j < NUMITER; j++) {
+        vector<point> p; //Position
+        vector<point> v; //velocity
+        vector<vector<point>> f(nThreads, vector<point>(gnumBodies)); //force
+        vector<double> m; //mass
 
-    vector<point> p; //Position
-    vector<point> v; //velocity
-    vector<vector<point>> f(nThreads, vector<point>(gnumBodies)); //force
-    vector<double> m; //mass
+        for (int i = 0; i < gnumBodies; i++) {
+            p.push_back(point(fRand(0, SIZE), fRand(0, SIZE)));
+            v.push_back(point(0,0));
+            m.push_back(fRand(6e22, 2e30));
+        }
 
-    for (int i = 0; i < gnumBodies; i++) {
-        p.push_back(point(fRand(0, SIZE), fRand(0, SIZE)));
-        v.push_back(point(0,0));
-        m.push_back(fRand(6e22, 2e30));
+        auto start = omp_get_wtime();
+        for (int i=0; i<numSteps; i++){
+            calculateForces(p, f, m, gnumBodies);
+            // cout << "hej" << endl;
+            moveBodies(p, f, m, v, gnumBodies);
+        }
+        med[j] = omp_get_wtime() - start;
+    }
+    sort(med.begin(), med.end());
+
+    float medianTime;
+    if (NUMITER % 2 == 0) {
+        medianTime = (med[NUMITER/2-1] + med[NUMITER/2])/2;
+    }
+    else {
+        medianTime = med[NUMITER/2];
     }
 
-    auto start = omp_get_wtime();
-    for (int i=0; i<numSteps; i++){
-
-        calculateForces(p, f, m, gnumBodies);
-        // cout << "hej" << endl;
-        moveBodies(p, f, m, v, gnumBodies);
-    }
-
-    cout << "Time taken was " << (omp_get_wtime() - start)<< " s"<< endl;
-
+    cout << "Time taken was " << medianTime << " s"<< endl;
 }
