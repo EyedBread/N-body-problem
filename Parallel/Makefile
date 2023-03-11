@@ -16,4 +16,4 @@ BarnesHut: main.cpp Body.o QuadTree.o Other.o
 	$(CC) $^ $(CFLAGS) -o $@
 
 clean:
-	rm -f *.o BarnesHut
+	rm -f *.o BarnesHut data.tmp

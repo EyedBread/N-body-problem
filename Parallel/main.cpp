@@ -60,6 +60,7 @@ int main(int argc, char** argv) {
     auto start = omp_get_wtime();
     for (int i = 0; i < numSteps; i++) {
         QuadTree tree(0, 0, SIZE, SIZE, far);
+
         #pragma omp parallel for
         for (int j = 0; j < gnumBodies; j++) {
             tree.insert(bodies[j]);
@@ -68,7 +69,6 @@ int main(int argc, char** argv) {
         for (int j = 0; j < gnumBodies; j++) {
             tree.updateForce(bodies[j]);
         }
-
 
         #pragma omp parallel for
         for (int j = 0; j < gnumBodies; j++) {
