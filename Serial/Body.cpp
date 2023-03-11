@@ -1,7 +1,7 @@
 #include "Body.h"
 #include <cmath>
 
-#define EPSILON 0.1
+#define EPSILON 100000
 
 using namespace std;
 
