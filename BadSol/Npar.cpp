@@ -45,7 +45,6 @@ void calculateForces(vector<point>& p, vector<vector<point>>& f, vector<double>&
             direction.y = p[j].y-p[i].y;
 
             //False sharing possible
-
             f[id][i].x = f[id][i].x + magnitude*direction.x/distance;
 
             f[id][j].x = f[id][j].x - magnitude*direction.x/distance;
